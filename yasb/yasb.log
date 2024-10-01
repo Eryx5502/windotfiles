@@ -1,0 +1,58 @@
+2024-08-23 13:13:36 INFO log.py:21: Yasb
+2024-08-23 13:13:36 ERROR config.py:80: The file 'C:\Users\aitor\.config\yasb\config.yaml' contains Parser Error(s). Please fix:
+while parsing a flow sequence
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 43, column 15
+expected ',' or ']', but got '<scalar>'
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 46, column 11
+2024-08-23 13:13:37 ERROR config.py:122: User config file could not be loaded. Exiting Application.
+2024-08-23 13:13:42 INFO log.py:21: Yasb
+2024-08-23 13:13:42 ERROR config.py:80: The file 'C:\Users\aitor\.config\yasb\config.yaml' contains Parser Error(s). Please fix:
+while parsing a flow sequence
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 43, column 15
+expected ',' or ']', but got '<scalar>'
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 46, column 11
+2024-08-23 13:13:42 ERROR config.py:122: User config file could not be loaded. Exiting Application.
+2024-08-23 13:14:46 INFO log.py:21: Yasb
+2024-08-23 13:14:46 ERROR config.py:80: The file 'C:\Users\aitor\.config\yasb\config.yaml' contains Parser Error(s). Please fix:
+while parsing a flow sequence
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 43, column 15
+expected ',' or ']', but got '<scalar>'
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 46, column 11
+2024-08-23 13:14:46 ERROR config.py:122: User config file could not be loaded. Exiting Application.
+2024-08-23 13:14:59 INFO log.py:21: Yasb
+2024-08-23 13:14:59 ERROR config.py:80: The file 'C:\Users\aitor\.config\yasb\config.yaml' contains Parser Error(s). Please fix:
+while parsing a flow sequence
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 43, column 15
+expected ',' or ']', but got '<scalar>'
+  in "C:\Users\aitor\.config\yasb\config.yaml", line 46, column 11
+2024-08-23 13:14:59 ERROR config.py:122: User config file could not be loaded. Exiting Application.
+2024-08-23 13:17:04 INFO log.py:21: Yasb
+2024-08-23 13:17:04 DEBUG win32.py:58: Looking up time zone info from registry
+2024-08-23 13:17:05 INFO weather.py:156: Fetched new weather data at 2024-08-23 13:17:05.145415
+2024-08-23 13:17:05 DEBUG __init__.py:143: CoInitializeEx(None, 2)
+2024-08-23 13:17:05 INFO event_listener.py:52: Created named pipe yasb-3ad84e32-6141-11ef-9b08-683e2685e13d
+2024-08-23 13:17:05 INFO event_listener.py:106: Waiting for Komorebi to subscribe to named pipe yasb-3ad84e32-6141-11ef-9b08-683e2685e13d
+2024-08-23 13:17:06 INFO watcher.py:39: Created file watcher for path C:\Users\aitor\.config\yasb
+2024-08-23 13:17:06 DEBUG _windows.py:213: Starting (proactor: <_IocpProactor overlapped#=0 result#=0>)...
+2024-08-23 13:17:06 DEBUG _windows.py:192: Thread started
+2024-08-23 13:17:06 WARNING event_listener.py:111: Komorebi failed to subscribe named pipe. Waiting for subscription...
+2024-08-23 13:19:54 INFO log.py:21: Yasb
+2024-08-23 13:19:54 DEBUG win32.py:58: Looking up time zone info from registry
+2024-08-23 13:19:55 INFO weather.py:156: Fetched new weather data at 2024-08-23 13:19:55.240348
+2024-08-23 13:19:55 DEBUG __init__.py:143: CoInitializeEx(None, 2)
+2024-08-23 13:19:56 INFO event_listener.py:52: Created named pipe yasb-a02f10d6-6141-11ef-a94e-683e2685e13d
+2024-08-23 13:19:56 INFO event_listener.py:106: Waiting for Komorebi to subscribe to named pipe yasb-a02f10d6-6141-11ef-a94e-683e2685e13d
+2024-08-23 13:19:56 INFO watcher.py:39: Created file watcher for path C:\Users\aitor\.config\yasb
+2024-08-23 13:19:56 DEBUG _windows.py:213: Starting (proactor: <_IocpProactor overlapped#=0 result#=0>)...
+2024-08-23 13:19:56 DEBUG _windows.py:192: Thread started
+2024-08-23 13:19:56 INFO event_listener.py:118: Komorebi connected to named pipe: yasb-a02f10d6-6141-11ef-a94e-683e2685e13d
+2024-08-23 13:22:04 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:22:32 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:22:43 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:22:58 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:23:07 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:23:19 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:23:55 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:23:59 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:24:23 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
+2024-08-23 13:24:43 INFO bar_manager.py:48: Successfully loaded updated stylesheet and applied to all bars.
