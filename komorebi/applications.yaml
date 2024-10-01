@@ -110,6 +110,24 @@
     matching_strategy: Equals
   options:
   - tray_and_multi_window
+- name: AutoDesk AutoCAD Suite
+  identifier:
+    kind: Exe
+    id: acad.exe
+    matching_strategy: Equals
+  float_identifiers:
+  - - kind: Class
+      id: 'Afx:'
+      matching_strategy: Contains
+    - kind: Exe
+      id: acad.exe
+      matching_strategy: Equals
+  - - kind: Class
+      id: HwndWrapper[DefaultDomain
+      matching_strategy: StartsWith
+    - kind: Exe
+      id: acad.exe
+      matching_strategy: Equals
 - name: AutoHotkey
   identifier:
     kind: Exe
@@ -1438,11 +1456,11 @@
 - name: Zebar
   identifier:
     kind: Exe
-    id: Zebar.exe
+    id: zebar.exe
     matching_strategy: Equals
   float_identifiers:
   - kind: Exe
-    id: Zebar.exe
+    id: zebar.exe
     matching_strategy: Equals
 - name: Zoom
   identifier:
@@ -1516,4 +1534,18 @@
   float_identifiers:
   - kind: Exe
     id: ueli.exe
+    matching_strategy: Equals
+- name: visio
+  identifier:
+    kind: Class
+    id: VISIOA
+    matching_strategy: Equals
+  options:
+  - force
+  float_identifiers:
+  - kind: Class
+    id: VISIOS
+    matching_strategy: Equals
+  - kind: Class
+    id: VISIOQ
     matching_strategy: Equals
