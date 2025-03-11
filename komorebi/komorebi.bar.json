@@ -9,11 +9,12 @@
       "bottom": 40
     }
   },
+  "max_label_width": 200,
   "font_family": "JetBrains Mono",
   "theme": {
     "palette": "Base16",
-    "name": "Ashes",
-    "accent": "Base0D"
+    "name": "CatppuccinFrappe",
+    "accent": "Base0F"
   },
   "left_widgets": [
     {
@@ -23,7 +24,7 @@
           "hide_empty_workspaces": false
         },
         "layout": {
-          "enable": true
+          "enable": false
         },
         "focused_window": {
           "enable": true,
@@ -40,7 +41,7 @@
     },
     {
       "Storage": {
-        "enable": true
+        "enable": false
       }
     },
     {
@@ -51,20 +52,20 @@
     {
       "Network": {
         "enable": true,
-        "show_total_data_transmitted": true,
+        "show_total_data_transmitted": false,
         "show_network_activity": true
       }
     },
     {
       "Date": {
         "enable": true,
-        "format": "DayDateMonthYear"
+        "format": { "Custom": "%a %x" }
       }
     },
     {
       "Time": {
         "enable": true,
-        "format": "TwentyFourHour"
+        "format": { "Custom": "%k:%M" }
       }
     },
     {
@@ -74,3 +75,4 @@
     }
   ]
 }
+
