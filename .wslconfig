@@ -1,0 +1,11 @@
+# After https://github.com/microsoft/WSL/issues/4699#issuecomment-2304879165
+# Settings apply across all Linux distros running on WSL 2
+[wsl2]
+# Prevent VHDX file to exceed a certain amount
+defaultVhdSize=40GB
+# No WSLg for komorebi
+# guiApplications=false
+
+# Experimental features
+[experimental]
+sparseVhd=true
