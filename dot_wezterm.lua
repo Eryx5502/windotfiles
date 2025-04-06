@@ -115,7 +115,7 @@ config.font = wezterm.font_with_fallback({
 config.font_size = 10
 
 -- For example, changing the color scheme:
-config.color_scheme = "catppuccin-macchiato"
+config.color_scheme = "Catppuccin Macchiato (Gogh)"
 
 config.show_update_window = true
 
