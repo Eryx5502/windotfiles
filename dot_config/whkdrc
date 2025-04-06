@@ -1,5 +1,6 @@
-.shell powershell
+.shell pwsh
 
+# oem codes in https://kbdlayout.info/KBDSP/virtualkeys
 # Reload whkd configuration
 # alt + o                 : taskkill /f /im whkd.exe && start /b whkd # if shell is cmd
 alt + o                 : taskkill /f /im whkd.exe; Start-Process whkd -WindowStyle hidden # if shell is pwsh / powershell
@@ -9,7 +10,7 @@ alt + shift + o         : komorebic reload-configuration
 # The apps will be focused if open, or launched if not open
 alt + w                 : if ($wshell.AppActivate('Firefox') -eq $False) { start firefox }
 alt + b                 : if ($wshell.AppActivate('Chrome') -eq $False) { start chrome }
-alt + t 	        : start wezterm-gui
+alt + t                 : start wezterm-gui
 
 alt + q                 : komorebic close
 alt + m                 : komorebic minimize
@@ -34,7 +35,7 @@ alt + left              : komorebic stack left
 alt + down              : komorebic stack down
 alt + up                : komorebic stack up
 alt + right             : komorebic stack right
-alt + u                 : komorebic unstack # oem_1 is ;
+alt + u                 : komorebic unstack
 alt + shift + up        : komorebic cycle-stack previous # oem_4 is [
 alt + shift + down      : komorebic cycle-stack next # oem_6 is ]
 
@@ -45,7 +46,7 @@ alt + shift + oem_plus  : komorebic resize-axis vertical increase
 alt + shift + oem_minus : komorebic resize-axis vertical decrease
 
 # Manipulate windows
-alt + shift + f                 : komorebic toggle-float
+alt + shift + f         : komorebic toggle-float
 alt + f                 : komorebic toggle-monocle
 
 # Window manager options
@@ -55,6 +56,11 @@ alt + p                 : komorebic toggle-pause
 # Layouts
 alt + x                 : komorebic flip-layout horizontal
 alt + y                 : komorebic flip-layout vertical
+
+# Monitors
+alt + 0                 : komorebic cycle-monitor next
+alt + oem_3             : komorebic cycle-monitor next # oem_3 is ñ
+alt + shift + oem_3     : komorebic cycle-move-to-monitor next # oem_3 is ñ
 
 # Workspaces
 alt + 1                 : komorebic focus-workspace 0

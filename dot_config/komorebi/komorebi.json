@@ -5,13 +5,13 @@
   "cross_monitor_move_behaviour": "Insert",
   "default_workspace_padding": 5,
   "default_container_padding": 5,
-  "border": false,
+  "border": true,
   "border_width": 2,
   "border_offset": -1,
   "border_colours": {
     "single": "#42a5f5",
     "stack": "#00a542",
-    "monocle": "#ff3399",
+    "monocle": "#bc5dff",
     "unfocused": "#808080"
   },
   "stackbar": {
@@ -30,70 +30,16 @@
       "kind": "Class"
     }
   ],
+  "display_index_preferences": {
+    "0": "4266",
+    "1": "1412444232"
+  },
   "monitors": [
     {
       "workspaces": [
         {
-          "name": "code",
+          "name": "I",
           "layout": "BSP"
-        },
-        {
-          "name": "web",
-          "layout": "BSP",
-          "workspace_rules": [
-            {
-              "kind": "Exe",
-              "id": "firefox.exe"
-            }
-          ]
-        },
-        {
-          "name": "tex",
-          "layout": "RightMainVerticalStack"
-        },
-        {
-          "name": "mail",
-          "layout": "BSP",
-          "initial_workspace_rules": [
-            {
-              "kind": "Exe",
-              "id": "thunderbird.exe"
-            }
-          ],
-          "workspace_rules": [
-            {
-              "kind": "Exe",
-              "id": "Telegram.exe"
-            },
-            {
-              "kind": "Title",
-              "id": "WhatsApp"
-            }
-          ]
-        },
-        {
-          "name": "media",
-          "layout": "BSP",
-          "workspace_rules": [
-            {
-              "kind": "Exe",
-              "id": "Spotify.exe"
-            },
-            {
-              "kind": "Exe",
-              "id": "Discord.exe"
-            }
-          ]
-        },
-        {
-          "name": "notes",
-          "layout": "Grid",
-          "workspace_rules": [
-            {
-              "kind": "Exe",
-              "id": "obsidian.exe"
-            }
-          ]
         }
       ]
     }
