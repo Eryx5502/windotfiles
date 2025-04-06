@@ -1,4 +1,5 @@
-$Env:KOMOREBI_CONFIG_HOME = 'C:\Users\aitor\.config\komorebi'
+$Env:XDG_CONFIG_HOME = "$HOME\.config"
+$Env:KOMOREBI_CONFIG_HOME = "$Env:XDG_CONFIG_HOME\komorebi"
 Import-Module -Name Terminal-Icons
 # fzf for history and file selector
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
