@@ -50,6 +50,7 @@ alt + shift + f         : komorebic toggle-float
 alt + f                 : komorebic toggle-monocle
 
 # Window manager options
+alt + shift + t         : komorebic toggle-workspace-float-override
 alt + shift + r         : komorebic retile
 alt + p                 : komorebic toggle-pause
 
