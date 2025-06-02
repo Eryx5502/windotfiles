@@ -65,9 +65,19 @@ config.keys = {
 
 	-- For forcing ctrl+space work on powershell
 	{ key = " ", mods = "CTRL", action = wezterm.action.SendKey({ key = " ", mods = "CTRL" }) },
+	-- Attach to muxer
+	{ key = "a", mods = "LEADER", action = wezterm.action.AttachDomain("unix") },
+	-- Detach from muxer
+	{ key = "d", mods = "LEADER", action = wezterm.action.DetachDomain({ DomainName = "unix" }) },
 }
 config.set_environment_variables = {}
 
+-- Sessions
+config.unix_domains = {
+	{
+		name = "unix",
+	},
+}
 -- This is where you actually apply your config choices
 config.launch_menu = {}
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
