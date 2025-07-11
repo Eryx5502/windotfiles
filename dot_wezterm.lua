@@ -34,6 +34,8 @@ config.keys = {
 	{ key = "-", mods = "LEADER", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
 	{ key = "|", mods = "LEADER", action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
 	{ key = "v", mods = "LEADER", action = wezterm.action.ActivateCopyMode },
+	{ key = "y", mods = "LEADER", action = wezterm.action.QuickSelect },
+	{ key = "f", mods = "LEADER", action = wezterm.action.Search("CurrentSelectionOrEmptyString") },
 	{ key = "z", mods = "LEADER", action = "TogglePaneZoomState" },
 	{ key = "c", mods = "LEADER", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
 	{ key = "h", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
