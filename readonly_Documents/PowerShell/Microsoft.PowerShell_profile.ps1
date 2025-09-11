@@ -10,3 +10,7 @@ fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
 oh-my-posh init pwsh --config "~/.config/ohmyposh.omp.json" | Invoke-Expression
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 Set-Alias lg lazygit
+
+#Variables
+$dotnet = "D:\desarrollo\dotnet"
+$javascript = "D:\desarrollo\javascript"
