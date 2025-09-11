@@ -83,7 +83,7 @@ config.unix_domains = {
 -- This is where you actually apply your config choices
 config.launch_menu = {}
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-	-- config.term = "" -- Set to empty so FZF works on windows
+	config.term = "xterm-256color" -- Set to empty so FZF works on windows
 	config.default_prog = { "pwsh.exe", "-NoLogo" }
 	table.insert(config.launch_menu, { label = "Pwsh", args = { "pwsh.exe", "-NoLogo" } })
 	table.insert(config.launch_menu, { label = "PowerShell", args = { "powershell.exe", "-NoLogo" } })
@@ -102,7 +102,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 		})
 	end
 end
-config.front_end = "WebGpu"
+-- config.front_end = "WebGpu"
 config.window_close_confirmation = "NeverPrompt"
 
 config.window_padding = {
@@ -131,6 +131,15 @@ config.font_size = 10
 config.color_scheme = "Catppuccin Macchiato (Gogh)"
 
 config.show_update_window = true
+
+-- QuickSelect Mode ==========
+config.quick_select_patterns = {
+	-- Pattern for Windows paths
+	[[[a-zA-Z]:[\\/][^ \t\r\n\"\'\<\>\|]*]],
+	[[(?:\.{1,2}[\\/])+[^ \t\r\n\"\'\<\>\|]*]],
+	[[#[a-zA-Z0-9_-]+]], -- Pattern for hashtags
+	[[@[a-zA-Z0-9_-]+]], -- Pattern for mentions
+}
 
 -- Pluguins =================
 wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm").apply_to_config(config)
