@@ -14,3 +14,19 @@ Set-Alias lg lazygit
 #Variables
 $dotnet = "D:\desarrollo\dotnet"
 $javascript = "D:\desarrollo\javascript"
+# Path for opencascade 3party
+$root = "D:\opencascade\3rdparty-vc14-64"
+$pathsToAdd = @()
+
+foreach ($subdir in Get-ChildItem $root -Directory) {
+    $binDir = Join-Path $subdir.FullName "bin"
+    $win64Dir = Join-Path $binDir "win64"
+
+    if (Test-Path $win64Dir) {
+        $pathsToAdd += $win64Dir
+    } elseif (Test-Path $binDir) {
+        $pathsToAdd += $binDir
+    }
+}
+
+$env:PATH += ";" + ($pathsToAdd -join ";")
