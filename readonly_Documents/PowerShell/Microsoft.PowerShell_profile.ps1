@@ -1,7 +1,7 @@
 $Env:XDG_CONFIG_HOME = "$HOME\.config"
 $Env:KOMOREBI_CONFIG_HOME = "$Env:XDG_CONFIG_HOME\komorebi"
+$env:TERM = "xterm-256color"
 Import-Module -Name Terminal-Icons
-Import-Module Svn
 # fzf for history and file selector
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 # Node fnm manager

@@ -19,7 +19,7 @@ function ss {
         return
     }
 
-    $selected = $svnStatus | fzf --multi `
+    $selected = $svnStatus | fzf `
         --multi `
         --preview 'svn diff {-1} | delta' `
         --accept-nth=-1 `
@@ -70,4 +70,15 @@ function sscl {
 
 function ssu {
     return svn update @args
+}
+
+function ssr {
+    $selected = ss @args
+
+    if (-not $selected) {
+        Write-Host "No lines selected."
+        return
+    }
+
+    return svn revert $selected
 }
