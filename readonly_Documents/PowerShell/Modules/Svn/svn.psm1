@@ -82,3 +82,14 @@ function ssr {
 
     return svn revert $selected
 }
+
+function ssb {
+    svn list . -R | fzf `
+        --multi `
+        --preview 'svn diff {-1} | delta' `
+        --accept-nth=-1 `
+        --style=minimal `
+        --preview-window=70% `
+        --layout=reverse `
+        # --bind 'ctrl-q:reload(svn status @args | rg "^[ACDIMRX\?!~]{0,1}-*\s+(.*)$" | Where-Object { $_.Trim() -ne "" })' `
+}
