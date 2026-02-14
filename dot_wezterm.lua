@@ -1,16 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
 
-local function file_exists(path)
-	local f = io.open(path, "r")
-	if f ~= nil then
-		io.close(f)
-		return true
-	else
-		return false
-	end
-end
-
 -- This table will hold the configuration.
 local config = {}
 
@@ -38,14 +28,6 @@ config.keys = {
 	{ key = "f", mods = "LEADER", action = wezterm.action.Search("CurrentSelectionOrEmptyString") },
 	{ key = "z", mods = "LEADER", action = "TogglePaneZoomState" },
 	{ key = "c", mods = "LEADER", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-	{ key = "h", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
-	{ key = "j", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Down" }) },
-	{ key = "k", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
-	{ key = "l", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
-	{ key = "H", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Left", 5 } }) },
-	{ key = "J", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Down", 5 } }) },
-	{ key = "K", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Up", 5 } }) },
-	{ key = "L", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Right", 5 } }) },
 	{ key = "1", mods = "LEADER", action = wezterm.action({ ActivateTab = 0 }) },
 	{ key = "2", mods = "LEADER", action = wezterm.action({ ActivateTab = 1 }) },
 	{ key = "3", mods = "LEADER", action = wezterm.action({ ActivateTab = 2 }) },
@@ -67,6 +49,19 @@ config.keys = {
 
 	-- For forcing ctrl+space work on powershell
 	{ key = " ", mods = "CTRL", action = wezterm.action.SendKey({ key = " ", mods = "CTRL" }) },
+	-- SSH into a server (prompts for user@host)
+	{
+		key = "o",
+		mods = "LEADER",
+		action = wezterm.action.PromptInputLine({
+			description = "SSH to (user@host)",
+			action = wezterm.action_callback(function(window, pane, line)
+				if line and line ~= "" then
+					window:perform_action(wezterm.action.SpawnCommandInNewTab({ args = { "ssh", line } }), pane)
+				end
+			end),
+		}),
+	},
 	-- Attach to muxer
 	{ key = "a", mods = "LEADER", action = wezterm.action.AttachDomain("unix") },
 	-- Detach from muxer
@@ -83,26 +78,26 @@ config.unix_domains = {
 -- This is where you actually apply your config choices
 config.launch_menu = {}
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-	config.term = "xterm-256color" -- Set to empty so FZF works on windows
+	config.term = "xterm-256color"
 	config.default_prog = { "pwsh.exe", "-NoLogo" }
 	table.insert(config.launch_menu, { label = "Pwsh", args = { "pwsh.exe", "-NoLogo" } })
 	table.insert(config.launch_menu, { label = "PowerShell", args = { "powershell.exe", "-NoLogo" } })
 
 	-- Find installed visual studio version(s) and add their compilation
 	-- environment command prompts to the menu
-	for _, vsvers in ipairs(wezterm.glob("Microsoft Visual Studio/20*", "C:/Program Files (x86)")) do
-		local year = vsvers:gsub("Microsoft Visual Studio/", "")
+	for _, vsvers in ipairs(wezterm.glob("Microsoft Visual Studio/*/Community", "C:/Program Files")) do
+		local year = vsvers:match("Microsoft Visual Studio/(.+)/Community")
 		table.insert(config.launch_menu, {
 			label = "x64 Native Tools VS " .. year,
 			args = {
 				"cmd.exe",
 				"/k",
-				"C:/Program Files (x86)/" .. vsvers .. "/BuildTools/VC/Auxiliary/Build/vcvars64.bat",
+				"C:/Program Files/" .. vsvers .. "/VC/Auxiliary/Build/vcvars64.bat",
 			},
 		})
 	end
 end
--- config.front_end = "WebGpu"
+config.front_end = "WebGpu"
 config.window_close_confirmation = "NeverPrompt"
 
 config.window_padding = {
@@ -141,7 +136,17 @@ config.quick_select_patterns = {
 	[[@[a-zA-Z0-9_-]+]], -- Pattern for mentions
 }
 
--- Pluguins =================
+-- Plugins =================
+-- Smart splits: seamless navigation between nvim and wezterm panes
+local smart_splits = wezterm.plugin.require("https://github.com/mrjones2014/smart-splits.nvim")
+smart_splits.apply_to_config(config, {
+	direction_keys = { "h", "j", "k", "l" },
+	modifiers = {
+		move = "CTRL",
+		resize = "CTRL|SHIFT",
+	},
+})
+
 wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm").apply_to_config(config)
 
 -- Tab bar
