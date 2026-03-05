@@ -62,6 +62,19 @@ config.keys = {
 			end),
 		}),
 	},
+	-- Rename tab
+	{
+		key = "r",
+		mods = "LEADER",
+		action = wezterm.action.PromptInputLine({
+			description = "Tab name",
+			action = wezterm.action_callback(function(window, pane, line)
+				if line and line ~= "" then
+					window:active_tab():set_title(line)
+				end
+			end),
+		}),
+	},
 	-- Attach to muxer
 	{ key = "a", mods = "LEADER", action = wezterm.action.AttachDomain("unix") },
 	-- Detach from muxer
@@ -69,6 +82,14 @@ config.keys = {
 }
 config.set_environment_variables = {}
 
+-- SSH servers
+config.ssh_domains = {
+	{
+		name = "dt12",
+		remote_address = "innomerics-dt12",
+		username = "abalmaseda",
+	},
+}
 -- Sessions
 config.unix_domains = {
 	{
@@ -107,7 +128,8 @@ config.window_padding = {
 	bottom = 0,
 }
 
-config.default_workspace = "~"
+config.default_gui_startup_args = { "connect", "unix" }
+config.default_workspace = "claude"
 config.window_decorations = "RESIZE"
 -- config.window_background_opacity = 0.97
 
@@ -135,6 +157,12 @@ config.quick_select_patterns = {
 	[[#[a-zA-Z0-9_-]+]], -- Pattern for hashtags
 	[[@[a-zA-Z0-9_-]+]], -- Pattern for mentions
 }
+
+-- Mux startup: create default workspaces
+wezterm.on("mux-startup", function()
+	local mux = wezterm.mux
+	mux.spawn_window({ workspace = "claude", cwd = "D:/desarrollo" })
+end)
 
 -- Plugins =================
 -- Smart splits: seamless navigation between nvim and wezterm panes
