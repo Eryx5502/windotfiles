@@ -1,0 +1,3 @@
+git:
+  pagers:
+    - externalDiffCommand: "~/Documents/PowerShell/Modules/lazygit-delta-pager.ps1"

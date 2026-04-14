@@ -128,7 +128,6 @@ config.window_padding = {
 	bottom = 0,
 }
 
-config.default_gui_startup_args = { "connect", "unix" }
 config.default_workspace = "claude"
 config.window_decorations = "RESIZE"
 -- config.window_background_opacity = 0.97
