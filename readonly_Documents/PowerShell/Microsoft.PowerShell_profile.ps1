@@ -1,5 +1,5 @@
-$Env:XDG_CONFIG_HOME = "$HOME\.config"
-$Env:KOMOREBI_CONFIG_HOME = "$Env:XDG_CONFIG_HOME\komorebi"
+# $Env:XDG_CONFIG_HOME = "$HOME\.config"
+# $Env:KOMOREBI_CONFIG_HOME = "$Env:XDG_CONFIG_HOME\komorebi"
 $env:TERM = "xterm-256color"
 Set-Alias ls lsd
 function la { lsd -la @args }
@@ -35,6 +35,9 @@ function Refresh-ProfileCache {
     Write-Host "Profile cache refreshed. Restart pwsh to apply."
 }
 Set-Alias lg lazygit
+
+# Load user scripts
+. "$PSScriptRoot\Scripts\wezterm-edit.ps1"
 
 #Variables
 $dotnet = "D:\desarrollo\dotnet"

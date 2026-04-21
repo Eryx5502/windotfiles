@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+; Registers a user-level "Open with" handler that opens files in nvim inside a
+; new wezterm window. After importing, Explorer's "Open with" -> "Choose another
+; app" will show "WezTerm + nvim"; check "Always use this app" per extension to
+; set as default.
+;
+; To remove: delete [HKEY_CURRENT_USER\Software\Classes\Applications\wezterm-gui.exe]
+; and any per-extension UserChoice overrides you set via Explorer.
+
+[HKEY_CURRENT_USER\Software\Classes\Applications\wezterm-gui.exe]
+"FriendlyAppName"="WezTerm + nvim"
+
+[HKEY_CURRENT_USER\Software\Classes\Applications\wezterm-gui.exe\shell\open\command]
+@="\"C:\\Program Files\\WezTerm\\wezterm-gui.exe\" start -- nvim \"%1\""
