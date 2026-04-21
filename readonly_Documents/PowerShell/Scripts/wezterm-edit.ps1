@@ -41,5 +41,5 @@ function e {
     $wezArgs += $Editor
     $wezArgs += $Path
 
-    & wezterm @args
+    & wezterm @wezArgs
 }
