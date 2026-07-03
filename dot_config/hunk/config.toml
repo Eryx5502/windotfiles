@@ -1,0 +1,4 @@
+# hunk global config
+# Theme options include: catppuccin-macchiato, catppuccin-mocha,
+# catppuccin-frappe, catppuccin-latte (plus many others hunk bundles).
+theme = "catppuccin-mocha"
