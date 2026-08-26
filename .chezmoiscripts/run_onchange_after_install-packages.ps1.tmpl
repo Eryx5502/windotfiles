@@ -1,0 +1,102 @@
+# Install the packages declared in .chezmoidata/packages.yaml.
+#
+# run_onchange_: the package list is embedded in this script's rendered content,
+# so editing that list re-runs the installer on the next `chezmoi apply`.
+# Already-installed packages are skipped.
+#
+# Never fails the apply: anything that will not install produces a warning and
+# the run continues, so one bad package cannot block the rest of your dotfiles.
+
+$ErrorActionPreference = 'Continue'
+
+$wingetUser = @(
+{{- range .packages.winget }}
+    '{{ . }}'
+{{- end }}
+)
+$wingetAdmin = @(
+{{- range .packages.wingetAdmin }}
+    '{{ . }}'
+{{- end }}
+)
+$psModules = @(
+{{- range .packages.psgallery }}
+    '{{ . }}'
+{{- end }}
+)
+
+$isAdmin = ([Security.Principal.WindowsPrincipal] `
+    [Security.Principal.WindowsIdentity]::GetCurrent()
+).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+function Install-WingetPackages {
+    param([string[]]$Ids, [hashtable]$Installed, [string]$Label)
+
+    $missing = @($Ids | Where-Object { -not $Installed.ContainsKey($_) })
+    if ($missing.Count -eq 0) {
+        Write-Host "winget [$Label]: all $($Ids.Count) package(s) already installed."
+        return @()
+    }
+    Write-Host "winget [$Label]: installing $($missing.Count) of $($Ids.Count) package(s)."
+    $failed = @()
+    foreach ($id in $missing) {
+        Write-Host "  -> $id"
+        winget install --id $id --exact --silent --accept-package-agreements --accept-source-agreements
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "     failed (exit $LASTEXITCODE): $id"
+            $failed += $id
+        }
+    }
+    return $failed
+}
+
+if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+    Write-Warning "winget not found - skipping $($wingetUser.Count + $wingetAdmin.Count) package(s). Install App Installer from the Microsoft Store, then re-run 'chezmoi apply'."
+}
+else {
+    # One export beats one `winget list` per package: the latter costs ~1-2s each.
+    $installed = @{}
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) ("winget-installed-" + [guid]::NewGuid().ToString('N') + ".json")
+    winget export -o $tmp --accept-source-agreements 2>&1 | Out-Null
+    if (Test-Path $tmp) {
+        try {
+            (Get-Content $tmp -Raw | ConvertFrom-Json).Sources.Packages |
+                ForEach-Object { $installed[$_.PackageIdentifier] = $true }
+        } catch {
+            Write-Warning "Could not parse the winget export; every package will be attempted."
+        }
+        Remove-Item $tmp -ErrorAction Ignore
+    }
+
+    $failed = Install-WingetPackages -Ids $wingetUser -Installed $installed -Label 'user'
+
+    if ($isAdmin) {
+        $failed += Install-WingetPackages -Ids $wingetAdmin -Installed $installed -Label 'admin'
+    }
+    else {
+        $pending = @($wingetAdmin | Where-Object { -not $installed.ContainsKey($_) })
+        if ($pending.Count -eq 0) {
+            Write-Host "winget [admin]: all $($wingetAdmin.Count) package(s) already installed."
+        }
+        else {
+            Write-Warning "$($pending.Count) package(s) need elevation and were SKIPPED. Run this in an admin terminal:"
+            $list = ($pending | ForEach-Object { "'$_'" }) -join ','
+            Write-Host ""
+            Write-Host "  $list | ForEach-Object { winget install --id `$_ --exact --silent --accept-package-agreements --accept-source-agreements }"
+            Write-Host ""
+            Write-Host "  (or just run 'chezmoi apply' from an elevated terminal)"
+        }
+    }
+
+    if ($failed.Count -gt 0) {
+        Write-Warning "Failed: $($failed -join ', ')"
+        Write-Warning "If a failure mentions elevation, move that package to 'wingetAdmin' in .chezmoidata/packages.yaml."
+    }
+}
+
+# --- PowerShell Gallery -----------------------------------------------------
+foreach ($m in $psModules) {
+    if (Get-Module -ListAvailable -Name $m) { continue }
+    Write-Host "PSGallery: installing $m"
+    Install-Module -Name $m -Scope CurrentUser -Force -AcceptLicense -ErrorAction Continue
+}

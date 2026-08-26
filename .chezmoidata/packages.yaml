@@ -1,0 +1,90 @@
+# Packages installed by .chezmoiscripts/run_onchange_after_install-packages.ps1.tmpl
+#
+# HOW THIS WORKS
+#   - Editing this file re-runs the installer on the next `chezmoi apply`.
+#   - Already-installed packages are skipped, so re-running is cheap and safe.
+#   - Delete what you never want; uncomment from the catalogue at the bottom to
+#     add. Everything listed was installed on the source machine (2026-08-26).
+#
+# ELEVATION
+#   `winget`      -> installs per-user, no admin rights needed.
+#   `wingetAdmin` -> machine-scope installers (they land in C:\Program Files).
+#                    When `chezmoi apply` runs unelevated these are SKIPPED and
+#                    the script prints one paste-able command for an admin shell.
+#                    Run `chezmoi apply` from an elevated terminal to do it all
+#                    in one pass.
+#   Unsure where a new package belongs? Put it under `winget`. If it needs
+#   elevation the install fails harmlessly and the script tells you to move it.
+
+packages:
+
+  # --- No admin required ---------------------------------------------------
+  winget:
+    - twpayne.chezmoi               # chezmoi itself
+    - Starship.Starship             # prompt (cached in the profile)
+    - ajeetdsouza.zoxide            # z
+    - Schniz.fnm                    # node version manager (lazy-init)
+    - junegunn.fzf                  # `s`/`n`/`wt` functions, svn helpers
+    - sharkdp.fd                    # `wt` function
+    - BurntSushi.ripgrep.MSVC       # rg: svn.psm1
+    - dandavison.delta              # git pager + lazygit diff renderer
+    - JesseDuffield.lazygit         # lg
+    - sxyazi.yazi                   # y / yz
+    - lsd-rs.lsd                    # ls / la aliases
+    - sharkdp.bat                   # bat
+    - Anthropic.Claude              # claude: `c` alias
+
+  # --- Requires an elevated shell ------------------------------------------
+  wingetAdmin:
+    - Git.Git                       # git
+    - Microsoft.PowerShell          # pwsh 7 (the profile targets this, not 5.1)
+    - Neovim.Neovim                 # nvim: `e`/`n` functions, yazi opener
+    - wez.wezterm.nightly           # wezterm: `e` function, ssh_domains
+    - LGUG2Z.komorebi               # window manager (komorebi.json managed here)
+    - LGUG2Z.whkd                   # hotkey daemon (whkdrc managed here)
+    - Slik.Subversion               # svn CLI: svn.psm1 helpers
+
+  psgallery:
+    - PSFzf                         # required: Ctrl+T / Ctrl+R in the profile
+    # - BurntToast
+    # - Microsoft.PowerToys.Configure
+
+# ===========================================================================
+# CATALOGUE - everything else installed on the source machine.
+# Move a line up into `winget` or `wingetAdmin` above to enable it.
+# ===========================================================================
+#
+# Dev toolchain
+#   Microsoft.VisualStudioCode      GoLang.Go       LLVM.LLVM
+#   Microsoft.WindowsTerminal       Kitware.CMake   Ninja-build.Ninja
+#   BrechtSanders.WinLibs.POSIX.UCRT
+#   Microsoft.VisualStudio.2022.Community    <- multi-GB
+#   Microsoft.VisualStudio.Community         <- multi-GB, duplicate of the above
+#
+# Server / .NET / database tooling
+#   Microsoft.DotNet.HostingBundle.10   Microsoft.msodbcsql.17
+#   Microsoft.SQLServer.OLEDBDriver     Microsoft.WebDeploy
+#   Microsoft.IIS.ApplicationRequestRouting   Microsoft.IIS.URLRewrite
+#   Microsoft.LogParser
+#   DBBrowserForSQLite.DBBrowserForSQLite     PawelSalawa.SQLiteStudio
+#
+# Applications / utilities
+#   7zip.7zip            Obsidian.Obsidian        DominikReichl.KeePass
+#   TortoiseSVN.TortoiseSVN                       Notepad++.Notepad++
+#   JAMSoftware.TreeSize.Free                     GlavSoft.TightVNC
+#   Google.Chrome        Zen-Team.Zen-Browser     Google.GoogleDrive
+#   Microsoft.Teams      Microsoft.Outlook        VideoLAN.VLC
+#   CodecGuide.K-LiteCodecPack.Full               Malwarebytes.Malwarebytes
+#   XP89DCGQ3K6VLD       <- Microsoft PowerToys (Store)
+#   9NKJ1F6L3SMT         <- Duplicate Media Finder (Store)
+#   gokcehan.lf          <- superseded by yazi; lfcd.ps1 is orphaned
+#
+# OS-bundled / dependency runtimes - installed automatically, no need to list:
+#   Microsoft.AppInstaller, Microsoft.Edge, Microsoft.OneDrive,
+#   Microsoft.UI.Xaml.2.8, Microsoft.VCLibs.14, Microsoft.VCLibs.Desktop.14,
+#   Microsoft.DotNet.Native.Runtime,
+#   Microsoft.VCRedist.{2005,2008,2010,2012,2013,2015+}.{x86,x64},
+#   Microsoft.WindowsAppRuntime.{1.2,1.6,1.7,1.8,2}
+#
+# Not available from winget or PSGallery - install by hand:
+#   lazymantis  (~/.local/bin/lazymantis.exe, `lm` alias)
