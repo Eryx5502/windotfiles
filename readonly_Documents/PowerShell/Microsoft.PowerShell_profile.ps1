@@ -1,40 +1,154 @@
 # $Env:XDG_CONFIG_HOME = "$HOME\.config"
 # $Env:KOMOREBI_CONFIG_HOME = "$Env:XDG_CONFIG_HOME\komorebi"
 $env:TERM = "xterm-256color"
+
+# Native tools (fzf, fd, rg, git...) emit UTF-8. Without this, PowerShell decodes
+# their stdout with the OEM codepage (CP850 here) and mangles accents, so captured
+# paths like `nvim (fzf)` break on ñ/í. Governs *reading* native stdout;
+# $OutputEncoding governs *writing* to their stdin.
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+$OutputEncoding = [System.Text.UTF8Encoding]::new()
+try { [Console]::InputEncoding = [System.Text.UTF8Encoding]::new() } catch {}
+
 Set-Alias ls lsd
 function la { lsd -la @args }
-# fzf for history and file selector (lazy-loaded on first use)
-$_loadPSFzf = {
-    Remove-PSReadLineKeyHandler 'Ctrl+t'
-    Remove-PSReadLineKeyHandler 'Ctrl+r'
-    Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
-}
-Set-PSReadLineKeyHandler -Chord 'Ctrl+t' -ScriptBlock { & $_loadPSFzf }
-Set-PSReadLineKeyHandler -Chord 'Ctrl+r' -ScriptBlock { & $_loadPSFzf }
-# Cache init scripts to avoid spawning processes on every startup.
-# Run Refresh-ProfileCache to regenerate after updating fnm, starship, or zoxide.
+Set-Alias lg lazygit
+Set-Alias lm lazymantis
+
 $_cacheDir = "$HOME\.cache\pwsh-init"
-if (-not (Test-Path "$_cacheDir\fnm.ps1")) {
-    New-Item -ItemType Directory -Path $_cacheDir -Force | Out-Null
-    fnm env --use-on-cd --shell powershell > "$_cacheDir\fnm.ps1"
-    starship init powershell --print-full-init > "$_cacheDir\starship.ps1"
-    zoxide init powershell > "$_cacheDir\zoxide.ps1"
+
+# Regenerates the cached init scripts. Run after updating starship or zoxide.
+# The cache is not a verbatim copy of `starship init`: two lines of starship's
+# generated init are rewritten because they dominate startup (see comments below).
+function Refresh-ProfileCache {
+    $dir = "$HOME\.cache\pwsh-init"
+    if (-not [IO.Directory]::Exists($dir)) {
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    }
+
+    $st = starship init powershell --print-full-init | Out-String
+
+    # 1. starship's init spawns starship.exe purely to fetch the continuation
+    #    prompt, a constant string. That process spawn costs ~45-50ms of EVERY
+    #    shell's startup, so bake the value in at cache time instead.
+    $cont = & starship prompt --continuation
+    if ($cont -is [array]) { $cont = $cont -join "`n" }
+    # The block spans several lines and contains a nested `@( ... )`. Anchor the end
+    # on a closing paren at the block's own 4-space indent, otherwise a lazy match
+    # stops at the inner paren and leaves the outer one orphaned.
+    $pat = '(?s)Set-PSReadLineOption -ContinuationPrompt \(.*?\r?\n    \)'
+    $m = [regex]::Match($st, $pat)
+    if ($m.Success) {
+        $lit = "Set-PSReadLineOption -ContinuationPrompt '" + ($cont -replace "'", "''") + "'"
+        $st = $st.Substring(0, $m.Index) + $lit + $st.Substring($m.Index + $m.Length)
+    }
+    else {
+        Write-Warning "Refresh-ProfileCache: continuation-prompt block not found; starship's init template changed. Startup stays correct but ~45ms slower."
+    }
+
+    # 2. `Get-Random -Count 16` cold-loads Utility's RNG machinery (~18ms) just to
+    #    build a random session tag. A GUID gives the same thing for free.
+    $pat2 = '\$ENV:STARSHIP_SESSION_KEY = .*'
+    $m2 = [regex]::Match($st, $pat2)
+    if ($m2.Success) {
+        $lit2 = '$ENV:STARSHIP_SESSION_KEY = [guid]::NewGuid().ToString("N").Substring(0, 16)'
+        $st = $st.Substring(0, $m2.Index) + $lit2 + $st.Substring($m2.Index + $m2.Length)
+    }
+    else {
+        Write-Warning "Refresh-ProfileCache: session-key line not found; starship's init template changed."
+    }
+
+    # Never ship a cache that does not parse: a bad rewrite would break the prompt
+    # in every new shell. Fall back to starship's unmodified init if that happens.
+    $perr = $null
+    $null = [System.Management.Automation.Language.Parser]::ParseInput($st, [ref]$null, [ref]$perr)
+    if ($perr -and $perr.Count) {
+        Write-Warning "Refresh-ProfileCache: rewritten starship init has $($perr.Count) parse error(s); falling back to the unmodified init (correct, ~30ms slower)."
+        $st = starship init powershell --print-full-init | Out-String
+    }
+
+    Set-Content -Path "$dir\starship.ps1" -Value $st -Encoding utf8NoBOM
+    zoxide init powershell | Set-Content -Path "$dir\zoxide.ps1" -Encoding utf8NoBOM
+
+    # fnm is deliberately NOT cached: `fnm env` bakes a snapshot of $env:PATH,
+    # which froze a stale PATH (dead fnm_multishells dirs + VS dev-shell paths)
+    # into every new shell. It is initialized lazily instead - see below.
+    Remove-Item "$dir\fnm.ps1" -ErrorAction Ignore
+
+    Write-Host "Profile cache refreshed ($dir). Restart pwsh to apply."
 }
-. "$_cacheDir\fnm.ps1"
+
+if (-not [IO.File]::Exists("$_cacheDir\starship.ps1")) { Refresh-ProfileCache }
+
+# ---------------------------------------------------------------------------
+# fzf (PSFzf) - lazy. Importing PSFzf costs ~290ms, so bind stubs that import it
+# on first use and then immediately run the real handler, so a single keypress is
+# enough. (A stub that only registered the binding needed the chord pressed twice.)
+# ---------------------------------------------------------------------------
+$_loadPSFzf = {
+    param($Chord)
+    # Passing the chords explicitly sets -Override, which replaces these stubs.
+    Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+    # PSFzf's handlers are module-private (absent from FunctionsToExport), so they
+    # have to be invoked inside the module's own session state.
+    $m = Get-Module PSFzf
+    switch ($Chord) {
+        'Ctrl+t' { & $m { Invoke-FzfPsReadlineHandlerProvider } }
+        'Ctrl+r' { & $m { Invoke-FzfPsReadlineHandlerHistory } }
+    }
+}
+Set-PSReadLineKeyHandler -Chord 'Ctrl+t' -ScriptBlock { & $_loadPSFzf 'Ctrl+t' }
+Set-PSReadLineKeyHandler -Chord 'Ctrl+r' -ScriptBlock { & $_loadPSFzf 'Ctrl+r' }
+
+# ---------------------------------------------------------------------------
+# fnm - lazy. `fnm env` costs ~45ms and rewrites PATH, so run it only when node
+# is actually used. node/npm/npx already resolve via fnm's `aliases\default` on
+# the persisted PATH; initializing adds per-project version switching from
+# .nvmrc / .node-version / package.json.
+# ---------------------------------------------------------------------------
+$global:__fnm_ready = $false
+# Resolves a name to the real executable/script on PATH, never to a stub function.
+function global:__fnm_real { param($Name) Get-Command $Name -CommandType Application, ExternalScript -ErrorAction Ignore | Select-Object -First 1 }
+function global:__fnm_init {
+    if ($global:__fnm_ready) { return }
+    $global:__fnm_ready = $true
+    # Drop the stubs so these names resolve to the real executables from here on.
+    # Note: the Function: provider takes no scope qualifier - "Function:\node",
+    # not "function:global:node", which silently removes nothing.
+    foreach ($n in 'node', 'npm', 'npx', 'corepack', 'fnm') {
+        Remove-Item "Function:\$n" -ErrorAction Ignore
+    }
+    $exe = __fnm_real fnm
+    if ($exe) {
+        $init = & $exe env --use-on-cd --shell powershell | Out-String
+        if ($init) { Invoke-Expression $init }
+    }
+}
+# Declared literally rather than via a Set-Item loop: Set-Item on the function:
+# drive cold-loads the Item provider (~13ms), literal definitions are ~0.1ms.
+# Each stub dispatches through __fnm_real so that even if the stub removal above
+# ever fails, the call lands on the executable instead of recursing into itself.
+function global:node { __fnm_init; & (__fnm_real node) @args }
+function global:npm { __fnm_init; & (__fnm_real npm) @args }
+function global:npx { __fnm_init; & (__fnm_real npx) @args }
+function global:corepack { __fnm_init; & (__fnm_real corepack) @args }
+function global:fnm { __fnm_init; & (__fnm_real fnm) @args }
+# Entering a node project also initializes fnm, mirroring `fnm env --use-on-cd`.
+function global:__fnm_lazy_cd {
+    param($path)
+    if ($null -eq $path) { Set-Location } else { Set-Location $path }
+    if (-not $global:__fnm_ready -and
+        ((Test-Path .nvmrc) -or (Test-Path .node-version) -or (Test-Path package.json))) {
+        __fnm_init
+    }
+}
+Set-Alias -Option AllScope -Scope global cd __fnm_lazy_cd
+
 # Transient prompt (function must be defined before starship init)
 function Invoke-Starship-TransientFunction { &starship module character }
 . "$_cacheDir\starship.ps1"
 Enable-TransientPrompt
 . "$_cacheDir\zoxide.ps1"
-
-# NOTE: After updating fnm, starship, or zoxide, run Refresh-ProfileCache and restart pwsh.
-function Refresh-ProfileCache {
-    fnm env --use-on-cd --shell powershell > "$_cacheDir\fnm.ps1"
-    starship init powershell --print-full-init > "$_cacheDir\starship.ps1"
-    zoxide init powershell > "$_cacheDir\zoxide.ps1"
-    Write-Host "Profile cache refreshed. Restart pwsh to apply."
-}
-Set-Alias lg lazygit
 
 # Load user scripts
 . "$PSScriptRoot\Scripts\wezterm-edit.ps1"
@@ -42,17 +156,6 @@ Set-Alias lg lazygit
 #Variables
 $dotnet = "D:\desarrollo\dotnet"
 $javascript = "D:\desarrollo\javascript"
-
-# Yazi file explorer (using y changes dir on exit, yazi won't)
-function y {
-    $tmp = (New-TemporaryFile).FullName
-    yazi $args --cwd-file="$tmp"
-    $cwd = Get-Content -Path $tmp -Encoding UTF8
-    if (-not [String]::IsNullOrEmpty($cwd) -and $cwd -ne $PWD.Path) {
-        Set-Location -LiteralPath (Resolve-Path -LiteralPath $cwd).Path
-    }
-    Remove-Item -Path $tmp
-}
 
 # Path for opencascade 3party
 # $root = "D:\opencascade\3rdparty-vc14-64"
@@ -71,6 +174,20 @@ function y {
 #
 # $env:PATH += ";" + ($pathsToAdd -join ";")
 
+# Yazi file explorer (using y changes dir on exit, yazi won't)
+function y {
+    $tmp = (New-TemporaryFile).FullName
+    yazi $args --cwd-file="$tmp"
+    $cwd = Get-Content -Path $tmp -Encoding UTF8
+    if (-not [String]::IsNullOrEmpty($cwd) -and $cwd -ne $PWD.Path) {
+        Set-Location -LiteralPath (Resolve-Path -LiteralPath $cwd).Path
+    }
+    Remove-Item -Path $tmp
+}
+function yz {
+    yazi $args
+}
+
 # Load Visual Studio dev shell + castor env on demand (call Enter-VsDev when needed)
 function vsdev {
     & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\Launch-VsDevShell.ps1' -Arch amd64 -HostArch amd64
@@ -79,3 +196,15 @@ function vsdev {
 function c {
   claude --dangerously-skip-permissions $args
 }
+function s {
+    start (fzf)
+}
+function n {
+    nvim (fzf)
+}
+function wt {
+    $worktree = (fd -t d -d 1 . ./.worktrees | fzf)
+    if ($worktree) {
+        cd $worktree
+      }
+  }

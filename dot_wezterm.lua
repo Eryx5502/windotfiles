@@ -146,8 +146,6 @@ config.font_size = 10
 -- For example, changing the color scheme:
 config.color_scheme = "Catppuccin Macchiato (Gogh)"
 
-config.show_update_window = true
-
 -- QuickSelect Mode ==========
 config.quick_select_patterns = {
 	-- Pattern for Windows paths
