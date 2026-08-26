@@ -1,4 +1,6 @@
 git:
+  # delta is a *stdin filter* (hooked up via GIT_PAGER), not an external diff
+  # program - so it needs no wrapper script. The previous `type: extDiff` setup
+  # shelled out to pwsh per diff (~658ms); this renders the same output in ~80ms.
   diffRenderers:
-    - command: "~/Documents/PowerShell/Modules/lazygit-delta-pager.ps1"
-      type: extDiff
+    - command: delta --dark --paging=never
