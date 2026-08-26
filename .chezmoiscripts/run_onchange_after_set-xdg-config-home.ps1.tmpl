@@ -1,0 +1,21 @@
+# Set XDG_CONFIG_HOME as a persistent Windows User environment variable.
+#
+# Several tools here resolve their config through it - lazygit reads
+# $XDG_CONFIG_HOME\lazygit, and the whole ~/.config layout depends on it.
+# Without this a fresh machine falls back to %APPDATA% and silently loses
+# those configs, so it cannot live only in the registry of one machine.
+#
+# Templated on purpose: the rendered content changes with the home directory,
+# which is what makes run_onchange_ re-run this on a different machine.
+# GetFullPath normalizes chezmoi's forward slashes to Windows separators.
+
+$target  = [IO.Path]::GetFullPath((Join-Path '{{ .chezmoi.homeDir }}' '.config'))
+$current = [Environment]::GetEnvironmentVariable('XDG_CONFIG_HOME', 'User')
+
+if ($current -ne $target) {
+    [Environment]::SetEnvironmentVariable('XDG_CONFIG_HOME', $target, 'User')
+    Write-Host "XDG_CONFIG_HOME (User) set to $target - restart your shell to pick it up."
+}
+else {
+    Write-Host "XDG_CONFIG_HOME already set to $target - nothing to do."
+}
