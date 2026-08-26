@@ -1,10 +1,18 @@
-# Machine-specific paths referenced by templated dotfiles.
-# Override per machine in ~/.config/chezmoi/chezmoi.toml under [data], e.g.
-#   [data.dev]
-#     root = 'E:\src'
-#   [data.vs]
-#     root = 'C:\Program Files\Microsoft Visual Studio\2022\Professional'
+# Machine-specific values referenced by templated dotfiles.
+# Override per machine in ~/.config/chezmoi/chezmoi.toml under [data].
+
 dev:
   root: 'D:\desarrollo'
 vs:
   root: 'C:\Program Files\Microsoft Visual Studio\18\Community'
+
+# Empty by design: real SSH targets are machine-local and must NOT live in this
+# public repo. Add them in ~/.config/chezmoi/chezmoi.toml, one block each:
+#
+#   [[data.sshDomains]]
+#       name = "dt12"
+#       host = "some-host"
+#       user = "someone"
+#
+# With none set, wezterm's ssh_domains renders as an empty table.
+sshDomains: []

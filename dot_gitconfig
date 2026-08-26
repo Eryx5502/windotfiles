@@ -7,11 +7,9 @@ email = abalmaseda@innomerics.com
 	useHttpPath = true
 	provider = generic
 	autoDetectTimeout = -1
-	helper = store
 [gui]
 	recentrepo = D:/desarrollo/pcf-viewer
 [credential "https://intranet.innomerics.com"]
-	helper = store
 	usehttppath = false
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f

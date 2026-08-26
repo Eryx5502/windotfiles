@@ -84,11 +84,13 @@ config.set_environment_variables = {}
 
 -- SSH servers
 config.ssh_domains = {
+{{- range .sshDomains }}
 	{
-		name = "dt12",
-		remote_address = "innomerics-dt12",
-		username = "abalmaseda",
+		name = "{{ .name }}",
+		remote_address = "{{ .host }}",
+		username = "{{ .user }}",
 	},
+{{- end }}
 }
 -- Sessions
 config.unix_domains = {
