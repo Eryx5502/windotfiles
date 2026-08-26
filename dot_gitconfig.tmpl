@@ -7,10 +7,10 @@ email = abalmaseda@innomerics.com
 	useHttpPath = true
 	provider = generic
 	autoDetectTimeout = -1
-[gui]
-	recentrepo = D:/desarrollo/pcf-viewer
-[credential "https://intranet.innomerics.com"]
+{{ if .git.internalHost -}}
+[credential "https://{{ .git.internalHost }}"]
 	usehttppath = false
+{{ end -}}
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process

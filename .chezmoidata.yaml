@@ -16,3 +16,13 @@ vs:
 #
 # With none set, wezterm's ssh_domains renders as an empty table.
 sshDomains: []
+
+# Internal git host referenced by .gitconfig's credential section. Empty here on
+# purpose: set it machine-locally in ~/.config/chezmoi/chezmoi.toml:
+#
+#   [data.git]
+#       internalHost = "git.example.com"
+#
+# With it empty, that credential section is omitted entirely.
+git:
+  internalHost: ''

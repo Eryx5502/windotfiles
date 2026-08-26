@@ -4,5 +4,5 @@
 prepend_keymap = [
   # `e` -> open the hovered (or selected) file(s) with the `e` command,
   # i.e. nvim in a new wezterm tab. Runs in the background so yazi stays open.
-  { on = "e", run = "shell 'pwsh -NoProfile -WindowStyle Hidden -File \"C:\\Users\\abalmaseda\\AppData\\Roaming\\yazi\\config\\open-with-e.ps1\" %s'", desc = "Open with e (nvim in new wezterm tab)" },
+  { on = "e", run = "shell 'pwsh -NoProfile -WindowStyle Hidden -File \"{{ .chezmoi.homeDir }}/AppData/Roaming/yazi/config/open-with-e.ps1\" %s'", desc = "Open with e (nvim in new wezterm tab)" },
 ]
