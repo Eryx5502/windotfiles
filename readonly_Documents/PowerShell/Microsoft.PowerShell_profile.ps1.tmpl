@@ -78,7 +78,7 @@ function Refresh-ProfileCache {
     Write-Host "Profile cache refreshed ($dir). Restart pwsh to apply."
 }
 
-if (-not [IO.File]::Exists("$_cacheDir\starship.ps1")) { Refresh-ProfileCache }
+if (-not ([IO.File]::Exists("$_cacheDir\starship.ps1") -and [IO.File]::Exists("$_cacheDir\zoxide.ps1"))) { Refresh-ProfileCache }
 
 # ---------------------------------------------------------------------------
 # fzf (PSFzf) - lazy. Importing PSFzf costs ~290ms, so bind stubs that import it

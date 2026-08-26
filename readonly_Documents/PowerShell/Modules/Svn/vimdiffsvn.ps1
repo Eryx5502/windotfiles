@@ -6,7 +6,7 @@ if (-not $file1 -or -not $file2) {
   return
 }
 
-if (Test-Path $file1 -and Test-Path $file2) {
+if ((Test-Path $file1) -and (Test-Path $file2)) {
   nvim -d $file1 $file2
 } else {
   Write-Error "One or both files do not exist."
