@@ -1,0 +1,9 @@
+# yazi config overrides — merged on top of the built-in defaults.
+
+[opener]
+# Override the built-in `edit` opener (VS Code by default on Windows).
+# `%s` = all selected paths (yazi >= 26.x syntax; the old `%*` / "$@" no longer expands).
+# `block = true` runs nvim in yazi's own terminal and restores yazi on :q.
+edit = [
+  { run = "nvim %s", desc = "nvim", block = true },
+]
