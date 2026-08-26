@@ -1,0 +1,10 @@
+# Machine-specific paths referenced by templated dotfiles.
+# Override per machine in ~/.config/chezmoi/chezmoi.toml under [data], e.g.
+#   [data.dev]
+#     root = 'E:\src'
+#   [data.vs]
+#     root = 'C:\Program Files\Microsoft Visual Studio\2022\Professional'
+dev:
+  root: 'D:\desarrollo'
+vs:
+  root: 'C:\Program Files\Microsoft Visual Studio\18\Community'

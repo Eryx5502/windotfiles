@@ -154,8 +154,8 @@ Enable-TransientPrompt
 . "$PSScriptRoot\Scripts\wezterm-edit.ps1"
 
 #Variables
-$dotnet = "D:\desarrollo\dotnet"
-$javascript = "D:\desarrollo\javascript"
+$dotnet = "{{ .dev.root }}\dotnet"
+$javascript = "{{ .dev.root }}\javascript"
 
 # Path for opencascade 3party
 # $root = "D:\opencascade\3rdparty-vc14-64"
@@ -190,7 +190,7 @@ function yz {
 
 # Load Visual Studio dev shell + castor env on demand (call Enter-VsDev when needed)
 function vsdev {
-    & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\Launch-VsDevShell.ps1' -Arch amd64 -HostArch amd64
+    & '{{ .vs.root }}\Common7\Tools\Launch-VsDevShell.ps1' -Arch amd64 -HostArch amd64
     cd -
 }
 function c {
