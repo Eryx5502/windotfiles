@@ -17,35 +17,35 @@
 #   elevation the install fails harmlessly and the script tells you to move it.
 
 packages:
-
   # --- No admin required ---------------------------------------------------
   winget:
-    - twpayne.chezmoi               # chezmoi itself
-    - Starship.Starship             # prompt (cached in the profile)
-    - ajeetdsouza.zoxide            # z
-    - Schniz.fnm                    # node version manager (lazy-init)
-    - junegunn.fzf                  # `s`/`n`/`wt` functions, svn helpers
-    - sharkdp.fd                    # `wt` function
-    - BurntSushi.ripgrep.MSVC       # rg: svn.psm1
-    - dandavison.delta              # git pager + lazygit diff renderer
-    - JesseDuffield.lazygit         # lg
-    - sxyazi.yazi                   # y / yz
-    - lsd-rs.lsd                    # ls / la aliases
-    - sharkdp.bat                   # bat
-    - Anthropic.Claude              # claude: `c` alias
+    - twpayne.chezmoi # chezmoi itself
+    - Starship.Starship # prompt (cached in the profile)
+    - ajeetdsouza.zoxide # z
+    - Schniz.fnm # node version manager (lazy-init)
+    - junegunn.fzf # `s`/`n`/`wt` functions, svn helpers
+    - sharkdp.fd # `wt` function
+    - BurntSushi.ripgrep.MSVC # rg: svn.psm1
+    - dandavison.delta # git pager + lazygit diff renderer
+    - JesseDuffield.lazygit # lg
+    - sxyazi.yazi # y / yz
+    - lsd-rs.lsd # ls / la aliases
+    - sharkdp.bat # bat
+    - Anthropic.Claude # claude: `c` alias
 
   # --- Requires an elevated shell ------------------------------------------
   wingetAdmin:
-    - Git.Git                       # git
-    - Microsoft.PowerShell          # pwsh 7 (the profile targets this, not 5.1)
-    - Neovim.Neovim                 # nvim: `e`/`n` functions, yazi opener
-    - wez.wezterm.nightly           # wezterm: `e` function, ssh_domains
-    - LGUG2Z.komorebi               # window manager (komorebi.json managed here)
-    - LGUG2Z.whkd                   # hotkey daemon (whkdrc managed here)
-    - Slik.Subversion               # svn CLI: svn.psm1 helpers
+    - Git.Git # git
+    - Microsoft.PowerShell # pwsh 7 (the profile targets this, not 5.1)
+    - Neovim.Neovim # nvim: `e`/`n` functions, yazi opener
+    - wez.wezterm.nightly # wezterm: `e` function, ssh_domains
+    - LGUG2Z.komorebi # window manager (komorebi.json managed here)
+    - LGUG2Z.whkd # hotkey daemon (whkdrc managed here)
+    - Slik.Subversion # svn CLI: svn.psm1 helpers
+    - 7zip.7zip # machine-wide installer (Program Files), needs elevation
 
   psgallery:
-    - PSFzf                         # required: Ctrl+T / Ctrl+R in the profile
+    - PSFzf # required: Ctrl+T / Ctrl+R in the profile
     # - BurntToast
     # - Microsoft.PowerToys.Configure
 
@@ -69,7 +69,7 @@ packages:
 #   DBBrowserForSQLite.DBBrowserForSQLite     PawelSalawa.SQLiteStudio
 #
 # Applications / utilities
-#   7zip.7zip            Obsidian.Obsidian        DominikReichl.KeePass
+#   Obsidian.Obsidian        DominikReichl.KeePass
 #   TortoiseSVN.TortoiseSVN                       Notepad++.Notepad++
 #   JAMSoftware.TreeSize.Free                     GlavSoft.TightVNC
 #   Google.Chrome        Zen-Team.Zen-Browser     Google.GoogleDrive
