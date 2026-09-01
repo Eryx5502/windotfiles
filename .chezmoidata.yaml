@@ -26,3 +26,21 @@ sshDomains: []
 # With it empty, that credential section is omitted entirely.
 git:
   internalHost: ''
+
+# Empty by design: real vault paths are machine-local and must NOT live in this
+# public repo. Add them in ~/.config/chezmoi/chezmoi.toml, one block each:
+#
+#   [[data.keepassVaults]]
+#       name = "personal"
+#       path = 'D:\me\personal.kdbx'
+#       default = true
+#
+#   [[data.keepassVaults]]
+#       name = "shared"
+#       path = 'S:\team\shared.kdbx'
+#       masterFromVault = "personal"       # vault holding this one's master password
+#       masterFromEntry = "Shared vault"   # entry in it whose Password field is that key
+#
+# Consumed by dot_config/keepass-credential/vaults.json.tmpl, which the KeePassCredential
+# PowerShell module reads on first use. With none set, it renders an empty array.
+keepassVaults: []

@@ -1,0 +1,33 @@
+{{/*
+  Vault list for the KeePassCredential PowerShell module.
+
+  Real paths are machine-local: declare them under [[data.keepassVaults]] in
+  ~/.config/chezmoi/chezmoi.toml, never in the public dotfiles repo. See the
+  keepassVaults comment in .chezmoidata.yaml.
+
+  The module reads this on first use of one of its commands, not at shell
+  startup, so a shell that never touches KeePass pays nothing for it.
+
+  Optional keys go through `dig` because chezmoi renders with missingkey=error,
+  so a bare $v.keyFile would abort the whole template when the key is absent.
+*/ -}}
+[
+{{- range $i, $v := .keepassVaults }}{{ if $i }},{{ end }}
+  {
+    "name": {{ $v.name | quote }},
+    "path": {{ $v.path | quote }}
+    {{- with dig "default" false $v }},
+    "default": true{{ end }}
+    {{- with dig "keyFile" "" $v }},
+    "keyFile": {{ . | quote }}{{ end }}
+    {{- with dig "useUserAccount" false $v }},
+    "useUserAccount": true{{ end }}
+    {{- with dig "masterFromVault" "" $v }},
+    "masterFromVault": {{ . | quote }}{{ end }}
+    {{- with dig "masterFromEntry" "" $v }},
+    "masterFromEntry": {{ . | quote }}{{ end }}
+    {{- with dig "masterFromGroupPath" "" $v }},
+    "masterFromGroupPath": {{ . | quote }}{{ end }}
+  }
+{{- end }}
+]
