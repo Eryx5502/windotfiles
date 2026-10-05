@@ -17,6 +17,105 @@ config.inactive_pane_hsb = {
 	brightness = 1.0,
 }
 
+-- Tab MRU switcher (alt+tab-like) =========
+-- The MRU order is frozen while cycling, otherwise repeated presses would just
+-- bounce between the two most recent tabs. It is committed once the key table ends.
+local MRU_TABLE = "tab_mru"
+local mru_states = {}
+
+local function mru_state(mux_win)
+	local id = mux_win:window_id()
+	mru_states[id] = mru_states[id] or { mru = {}, cycling = false, idx = 1 }
+	return mru_states[id]
+end
+
+local function mru_sync(mux_win, s)
+	local alive = {}
+	for _, t in ipairs(mux_win:tabs()) do
+		alive[t:tab_id()] = true
+	end
+	local list = {}
+	for _, id in ipairs(s.mru) do
+		if alive[id] then
+			table.insert(list, id)
+			alive[id] = nil
+		end
+	end
+	for _, t in ipairs(mux_win:tabs()) do
+		if alive[t:tab_id()] then
+			table.insert(list, t:tab_id())
+		end
+	end
+	s.mru = list
+end
+
+local function mru_promote(s, tab_id)
+	for i, id in ipairs(s.mru) do
+		if id == tab_id then
+			table.remove(s.mru, i)
+			break
+		end
+	end
+	table.insert(s.mru, 1, tab_id)
+end
+
+wezterm.on("update-status", function(window, _)
+	local mux_win = window:mux_window()
+	local s = mru_state(mux_win)
+	if s.cycling then
+		if window:active_key_table() == MRU_TABLE then
+			return
+		end
+		s.cycling = false
+	end
+	mru_sync(mux_win, s)
+	mru_promote(s, window:active_tab():tab_id())
+end)
+
+local function mru_step(dir)
+	return wezterm.action_callback(function(window, pane)
+		local mux_win = window:mux_window()
+		local s = mru_state(mux_win)
+		if not s.cycling or window:active_key_table() ~= MRU_TABLE then
+			mru_sync(mux_win, s)
+			mru_promote(s, window:active_tab():tab_id())
+			s.cycling = true
+			s.idx = 1
+		end
+		local n = #s.mru
+		if n < 2 then
+			return
+		end
+		s.idx = (s.idx - 1 + dir) % n + 1
+		local target = s.mru[s.idx]
+		for _, t in ipairs(mux_win:tabs()) do
+			if t:tab_id() == target then
+				t:activate()
+				break
+			end
+		end
+		window:perform_action(
+			wezterm.action.ActivateKeyTable({
+				name = MRU_TABLE,
+				one_shot = false,
+				until_unknown = true,
+				timeout_milliseconds = 1000,
+				replace_current = true,
+			}),
+			pane
+		)
+	end)
+end
+
+config.key_tables = {
+	[MRU_TABLE] = {
+		{ key = "j", action = mru_step(1) },
+		{ key = "k", action = mru_step(-1) },
+		{ key = "Escape", action = wezterm.action.PopKeyTable },
+		{ key = "Enter", action = wezterm.action.PopKeyTable },
+	},
+}
+
 config.leader = { key = "F8" }
 config.disable_default_key_bindings = true
 config.keys = {
@@ -39,6 +138,8 @@ config.keys = {
 	{ key = "9", mods = "LEADER", action = wezterm.action({ ActivateTab = 8 }) },
 	{ key = "&", mods = "LEADER|SHIFT", action = wezterm.action({ CloseCurrentTab = { confirm = true } }) },
 	{ key = "x", mods = "LEADER", action = wezterm.action({ CloseCurrentPane = { confirm = true } }) },
+	{ key = "j", mods = "LEADER", action = mru_step(1) },
+	{ key = "k", mods = "LEADER", action = mru_step(-1) },
 
 	{ key = "n", mods = "SHIFT|CTRL", action = "ToggleFullScreen" },
 	{ key = "v", mods = "SHIFT|CTRL", action = wezterm.action.PasteFrom("Clipboard") },
