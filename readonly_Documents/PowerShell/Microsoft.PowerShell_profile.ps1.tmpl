@@ -244,3 +244,44 @@ function wt {
       cd $worktree
     }
 }
+
+# Parses `quser` output into objects (works with Spanish or English output)
+function Get-QuserSession {
+    param([Parameter(Mandatory)][string] $ComputerName)
+
+    quser /server:$ComputerName 2>$null | Select-Object -Skip 1 | ForEach-Object {
+        # Session name is empty for disconnected sessions, hence \S*?
+        if ($_ -match '^.(?<User>\S+)\s+(?<Session>\S*?)\s+(?<Id>\d+)\s+(?<State>\S+)\s+(?<Idle>\S+)\s+(?<Logon>.+)$') {
+            [pscustomobject]@{
+                User      = $Matches.User
+                Session   = $Matches.Session
+                Id        = [int]$Matches.Id
+                State     = $Matches.State
+                Idle      = $Matches.Idle
+                LogonTime = $Matches.Logon.Trim()
+            }
+        }
+    }
+}
+
+# Sessions on a server + the RDP client machine of each one + who is logged in on that client
+function Get-RemoteSession {
+    param([Parameter(Mandatory)][string] $ComputerName)
+
+    # Every logged-on user has HKU\<SID>\Volatile Environment\<SessionId>\CLIENTNAME
+    $clients = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+        Get-ItemProperty 'Registry::HKEY_USERS\*\Volatile Environment\*' -ErrorAction SilentlyContinue |
+            Select-Object PSChildName, CLIENTNAME
+    }
+
+    foreach ($s in Get-QuserSession $ComputerName) {
+        $client = ($clients | Where-Object PSChildName -eq $s.Id).CLIENTNAME
+        if ($client -eq 'Console') { $client = $null }
+
+        $clientUsers = if ($client) { (Get-QuserSession $client).User -join ', ' }
+
+        $s | Select-Object *,
+            @{ n = 'Client';      e = { $client } },
+            @{ n = 'ClientUsers'; e = { $clientUsers } }
+    }
+}
