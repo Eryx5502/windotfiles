@@ -239,8 +239,8 @@ function n {
     nvim (fzf)
 }
 function wt {
-    $worktree = (fd -t d -d 1 . ./.worktrees | fzf)
-    if ($worktree) {
-        cd $worktree
-      }
-  }
+  $worktree = (fd -t d -d 1 . ./.worktrees | fzf)
+  if ($worktree) {
+      cd $worktree
+    }
+}
