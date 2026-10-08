@@ -144,6 +144,40 @@ function global:__fnm_lazy_cd {
 }
 Set-Alias -Option AllScope -Scope global cd __fnm_lazy_cd
 
+# ---------------------------------------------------------------------------
+# starship git_status - off in the big repos. Starship scans the worktree in-process
+# and takes ~450-600ms per prompt on the ~29k-file dotnet checkouts (plain
+# `git status` ~170ms); the prompt without it is ~65ms. Showing fewer git_status
+# fields does not help, the scan itself is the cost. Inside these trees starship
+# gets a variant config whose format omits $git_status, rebuilt from starship.toml
+# whenever that file is newer. Paths match themselves and everything below them.
+# ---------------------------------------------------------------------------
+$global:__starship_slow_repos = 'D:\desarrollo\dotnet', 'D:\desarrollo\dotnet-pamone-modern'
+$global:__starship_bigrepo_toml = "$_cacheDir\starship-bigrepo.toml"
+$_starshipToml = "$HOME\.config\starship.toml"
+# A missing file reads as year 1601, so a first run always builds the variant.
+if ([IO.File]::GetLastWriteTimeUtc($_starshipToml) -gt [IO.File]::GetLastWriteTimeUtc($__starship_bigrepo_toml)) {
+    $_toml = [IO.File]::ReadAllText($_starshipToml)
+    if ($_toml.Contains('$git_status')) {
+        [IO.File]::WriteAllText($__starship_bigrepo_toml, $_toml.Replace('$git_status', ''))
+    }
+    else {
+        Write-Warning "starship.toml no longer references `$git_status; $__starship_bigrepo_toml was not rebuilt."
+    }
+}
+# Without a variant, STARSHIP_CONFIG would point at nothing and starship would fall
+# back to its default config, so leave every repo on the normal one instead.
+if (-not [IO.File]::Exists($__starship_bigrepo_toml)) { $global:__starship_slow_repos = @() }
+# starship's prompt calls this before rendering, on every prompt.
+function Invoke-Starship-PreCommand {
+    $p = $PWD.ProviderPath
+    $slow = $false
+    foreach ($r in $global:__starship_slow_repos) {
+        if ($p.Equals($r, 'OrdinalIgnoreCase') -or $p.StartsWith("$r\", 'OrdinalIgnoreCase')) { $slow = $true; break }
+    }
+    $env:STARSHIP_CONFIG = if ($slow) { $global:__starship_bigrepo_toml } else { $null }
+}
+
 # Transient prompt (function must be defined before starship init)
 function Invoke-Starship-TransientFunction { &starship module character }
 . "$_cacheDir\starship.ps1"
