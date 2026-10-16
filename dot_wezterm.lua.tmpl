@@ -193,6 +193,9 @@ config.ssh_domains = {
 	},
 {{- end }}
 }
+{{- range $d := .sshDomains }}{{ with dig "leaderKey" "" $d }}
+table.insert(config.keys, { key = "{{ . }}", mods = "LEADER", action = wezterm.action.AttachDomain("{{ $d.name }}") })
+{{- end }}{{ end }}
 -- Sessions
 config.unix_domains = {
 	{
@@ -262,7 +265,9 @@ config.quick_select_patterns = {
 -- Mux startup: create default workspaces
 wezterm.on("mux-startup", function()
 	local mux = wezterm.mux
-	mux.spawn_window({ workspace = "claude", cwd = "{{ .dev.root | replace "\\" "/" }}" })
+	-- Only pin the cwd where the dev root exists: spawning into a missing directory fails.
+	local dev_root = "{{ .dev.root | replace "\\" "/" }}"
+	mux.spawn_window({ workspace = "claude", cwd = #wezterm.glob(dev_root) > 0 and dev_root or nil })
 end)
 
 -- Plugins =================
@@ -277,6 +282,25 @@ smart_splits.apply_to_config(config, {
 })
 
 wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm").apply_to_config(config)
+{{- $hasHostLabel := false }}{{ range .sshDomains }}{{ if dig "hostLabel" "" . }}{{ $hasHostLabel = true }}{{ end }}{{ end }}
+{{- if $hasHostLabel }}
+
+-- Tab bar shows the remote host's name while a pane is attached to an SSH domain.
+-- Registered before bar.wezterm so active_domain is current when the bar renders.
+local domain_host_labels = {
+{{- range $d := .sshDomains }}{{ with dig "hostLabel" "" $d }}
+	["{{ $d.name }}"] = "{{ . }}",
+{{- end }}{{ end }}
+}
+local active_domain = "local"
+wezterm.on("update-status", function(_, pane)
+	active_domain = pane:get_domain_name()
+end)
+local real_hostname = wezterm.hostname
+wezterm.hostname = function()
+	return domain_host_labels[active_domain] or real_hostname()
+end
+{{- end }}
 
 -- Tab bar
 wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm").apply_to_config(config, { position = "top" })

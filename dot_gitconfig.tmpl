@@ -1,11 +1,13 @@
 # This is Git's per-user configuration file.
 [user]
 # Please adapt and uncomment the following lines:
-name = Aitor Balmaseda
-email = abalmaseda@innomerics.com
+name = {{ .git.name }}
+email = {{ .git.email }}
 [credential]
-	useHttpPath = true
-	provider = generic
+	useHttpPath = {{ .git.useHttpPath }}
+{{- with .git.gcmProvider }}
+	provider = {{ . }}
+{{- end }}
 	autoDetectTimeout = -1
 {{ if .git.internalHost -}}
 [credential "https://{{ .git.internalHost }}"]
@@ -19,6 +21,9 @@ email = abalmaseda@innomerics.com
 [core]
 	editor = nvim
 	pager = delta
+{{- with .git.sshCommand }}
+	sshCommand = {{ . }}
+{{- end }}
 [interactive]
 	diffFilter = delta --color-only
 [delta]

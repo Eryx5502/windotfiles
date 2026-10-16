@@ -13,6 +13,8 @@ vs:
 #       name = "dt12"
 #       host = "some-host"
 #       user = "someone"
+#       leaderKey = "i"          # optional: LEADER+<key> attaches this domain
+#       hostLabel = "some-pc"    # optional: tab bar hostname while attached
 #
 # With none set, wezterm's ssh_domains renders as an empty table.
 sshDomains: []
@@ -24,8 +26,25 @@ sshDomains: []
 #       internalHost = "git.example.com"
 #
 # With it empty, that credential section is omitted entirely.
+#
+# Identity and Git Credential Manager settings default to the work machine.
+# Override any of them per machine the same way, e.g. a personal laptop:
+#
+#   [data.git]
+#       name = "A. Balmaseda"
+#       email = "me@example.com"
+#       gcmProvider = ""     # empty: let GCM auto-detect (GitHub OAuth etc.)
+#       useHttpPath = false
+#       sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
+#
+# GCM itself comes from Git for Windows' system config (credential.helper=manager).
 git:
   internalHost: ''
+  name: 'Aitor Balmaseda'
+  email: 'abalmaseda@innomerics.com'
+  gcmProvider: 'generic'
+  useHttpPath: true
+  sshCommand: ''
 
 # Empty by design: real vault paths are machine-local and must NOT live in this
 # public repo. Add them in ~/.config/chezmoi/chezmoi.toml, one block each:
