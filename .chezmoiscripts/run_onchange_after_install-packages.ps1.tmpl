@@ -41,7 +41,8 @@ function Install-WingetPackages {
     $failed = @()
     foreach ($id in $missing) {
         Write-Host "  -> $id"
-        winget install --id $id --exact --silent --accept-package-agreements --accept-source-agreements
+        # Out-Host: otherwise winget's output joins this function's return value (the failed list).
+        winget install --id $id --exact --silent --accept-package-agreements --accept-source-agreements | Out-Host
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "     failed (exit $LASTEXITCODE): $id"
             $failed += $id

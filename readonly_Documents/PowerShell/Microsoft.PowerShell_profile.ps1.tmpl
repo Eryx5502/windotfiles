@@ -78,7 +78,9 @@ function Refresh-ProfileCache {
     Write-Host "Profile cache refreshed ($dir). Restart pwsh to apply."
 }
 
-if (-not ([IO.File]::Exists("$_cacheDir\starship.ps1") -and [IO.File]::Exists("$_cacheDir\zoxide.ps1"))) { Refresh-ProfileCache }
+# Empty counts as missing: a refresh run before starship was installed leaves a 0-byte cache.
+$_st = [IO.FileInfo]::new("$_cacheDir\starship.ps1"); $_zo = [IO.FileInfo]::new("$_cacheDir\zoxide.ps1")
+if (-not ($_st.Exists -and $_st.Length -gt 0 -and $_zo.Exists -and $_zo.Length -gt 0)) { Refresh-ProfileCache }
 
 # ---------------------------------------------------------------------------
 # fzf (PSFzf) - lazy. Importing PSFzf costs ~290ms, so bind stubs that import it
@@ -187,7 +189,8 @@ Enable-TransientPrompt
 # Load user scripts
 . "$PSScriptRoot\Scripts\wezterm-edit.ps1"
 . "$PSScriptRoot\Scripts\ssh-copy-id.ps1"
-Import-Module "D:/obsidian/cogbrain/tasks/CogTodo"
+# Only where the vault exists (it is machine-local); a missing path would error every startup.
+if (Test-Path "D:/obsidian/cogbrain/tasks/CogTodo") { Import-Module "D:/obsidian/cogbrain/tasks/CogTodo" }
 
 #Variables
 $dotnet = "{{ .dev.root }}\dotnet"
