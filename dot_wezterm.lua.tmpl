@@ -178,8 +178,8 @@ config.keys = {
 	},
 	-- Attach to muxer
 	{ key = "a", mods = "LEADER", action = wezterm.action.AttachDomain("unix") },
-	-- Detach from muxer
-	{ key = "d", mods = "LEADER", action = wezterm.action.DetachDomain({ DomainName = "unix" }) },
+	-- Detach the current pane's domain (local muxer or SSH); it keeps running there
+	{ key = "d", mods = "LEADER", action = wezterm.action.DetachDomain("CurrentPaneDomain") },
 }
 config.set_environment_variables = {}
 
