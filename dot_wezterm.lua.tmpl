@@ -190,12 +190,38 @@ config.ssh_domains = {
 		name = "{{ .name }}",
 		remote_address = "{{ .host }}",
 		username = "{{ .user }}",
+{{- with dig "multiplexing" "" . }}
+		multiplexing = "{{ . }}",
+{{- end }}
 	},
 {{- end }}
 }
-{{- range $d := .sshDomains }}{{ with dig "leaderKey" "" $d }}
-table.insert(config.keys, { key = "{{ . }}", mods = "LEADER", action = wezterm.action.AttachDomain("{{ $d.name }}") })
-{{- end }}{{ end }}
+{{- /* Domains sharing a leaderKey get a picker; a lone domain attaches directly. */}}
+{{- $keys := list }}{{ range .sshDomains }}{{ with dig "leaderKey" "" . }}{{ if not (has . $keys) }}{{ $keys = append $keys . }}{{ end }}{{ end }}{{ end }}
+{{- range $k := $keys }}
+{{- $group := list }}{{ range $.sshDomains }}{{ if eq (dig "leaderKey" "" .) $k }}{{ $group = append $group . }}{{ end }}{{ end }}
+{{- if eq (len $group) 1 }}
+table.insert(config.keys, { key = "{{ $k }}", mods = "LEADER", action = wezterm.action.AttachDomain("{{ (index $group 0).name }}") })
+{{- else }}
+table.insert(config.keys, {
+	key = "{{ $k }}",
+	mods = "LEADER",
+	action = wezterm.action.InputSelector({
+		title = "Attach to SSH domain",
+		choices = {
+{{- range $group }}
+			{ id = "{{ .name }}", label = "{{ dig "label" .name . }}" },
+{{- end }}
+		},
+		action = wezterm.action_callback(function(window, pane, id)
+			if id then
+				window:perform_action(wezterm.action.AttachDomain(id), pane)
+			end
+		end),
+	}),
+})
+{{- end }}
+{{- end }}
 -- Sessions
 config.unix_domains = {
 	{

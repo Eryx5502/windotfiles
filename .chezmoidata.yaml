@@ -15,9 +15,24 @@ vs:
 #       user = "someone"
 #       leaderKey = "i"          # optional: LEADER+<key> attaches this domain
 #       hostLabel = "some-pc"    # optional: tab bar hostname while attached
+#       multiplexing = "WezTerm" # optional: emitted as the domain's multiplexing field
+#       label = "Office"         # optional: picker label (defaults to name)
 #
+# Domains sharing a leaderKey get an InputSelector picker; a lone one attaches directly.
 # With none set, wezterm's ssh_domains renders as an empty table.
 sshDomains: []
+
+# Empty by design, same reason as sshDomains. ~/.ssh/config renders these Host
+# blocks, in order, ahead of the shared "Host *" block:
+#
+#   [[data.sshHosts]]
+#       pattern = "dt12 dt12-alt"
+#       options = ['User someone', "DynamicForward 1080"]
+#
+#   [[data.sshHosts]]
+#       pattern = "dt12"
+#       options = ["HostName some-host"]
+sshHosts: []
 
 # Internal git host referenced by .gitconfig's credential section. Empty here on
 # purpose: set it machine-locally in ~/.config/chezmoi/chezmoi.toml:

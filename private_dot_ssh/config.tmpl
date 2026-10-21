@@ -1,0 +1,10 @@
+{{ range .sshHosts -}}
+Host {{ .pattern }}
+{{- range .options }}
+    {{ . }}
+{{- end }}
+
+{{ end -}}
+Host *
+    AddKeysToAgent yes
+    IdentitiesOnly yes
