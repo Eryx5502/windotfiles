@@ -262,7 +262,7 @@ config.quick_select_patterns = {
 -- Mux startup: create default workspaces
 wezterm.on("mux-startup", function()
 	local mux = wezterm.mux
-	mux.spawn_window({ workspace = "claude", cwd = "D:/desarrollo" })
+	mux.spawn_window({ workspace = "claude", cwd = "{{ .dev.root | replace "\\" "/" }}" })
 end)
 
 -- Plugins =================
