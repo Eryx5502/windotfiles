@@ -261,7 +261,7 @@ config.window_padding = {
 	bottom = 0,
 }
 
-config.default_workspace = "claude"
+config.default_workspace = "{{ .workspacePrefix }}claude"
 config.window_decorations = "RESIZE"
 -- config.window_background_opacity = 0.97
 
@@ -293,7 +293,7 @@ wezterm.on("mux-startup", function()
 	local mux = wezterm.mux
 	-- Only pin the cwd where the dev root exists: spawning into a missing directory fails.
 	local dev_root = "{{ .dev.root | replace "\\" "/" }}"
-	mux.spawn_window({ workspace = "claude", cwd = #wezterm.glob(dev_root) > 0 and dev_root or nil })
+	mux.spawn_window({ workspace = "{{ .workspacePrefix }}claude", cwd = #wezterm.glob(dev_root) > 0 and dev_root or nil })
 end)
 
 -- Plugins =================
@@ -307,7 +307,31 @@ smart_splits.apply_to_config(config, {
 	},
 })
 
+{{ if .workspacePrefix -}}
+local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
+workspace_switcher.apply_to_config(config)
+-- The switcher names a folder's workspace after its label, so prefixing the zoxide
+-- labels prefixes the workspaces it creates. Entries whose prefixed workspace is
+-- already open are dropped, as the plugin does for unprefixed ones.
+local workspace_prefix = "{{ .workspacePrefix }}"
+local get_zoxide_elements = workspace_switcher.choices.get_zoxide_elements
+workspace_switcher.choices.get_zoxide_elements = function(choice_table, opts)
+	local first_new = #choice_table + 1
+	get_zoxide_elements(choice_table, opts)
+	local open = (opts and opts.workspace_ids) or {}
+	for i = #choice_table, first_new, -1 do
+		local label = workspace_prefix .. choice_table[i].label
+		if open[label] then
+			table.remove(choice_table, i)
+		else
+			choice_table[i].label = label
+		end
+	end
+	return choice_table
+end
+{{- else -}}
 wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm").apply_to_config(config)
+{{- end }}
 {{- $hasHostLabel := false }}{{ range .sshDomains }}{{ if dig "hostLabel" "" . }}{{ $hasHostLabel = true }}{{ end }}{{ end }}
 {{- if $hasHostLabel }}
 

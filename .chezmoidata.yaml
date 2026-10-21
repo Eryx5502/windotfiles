@@ -6,6 +6,12 @@ dev:
 vs:
   root: 'C:\Program Files\Microsoft Visual Studio\18\Community'
 
+# Prepended to every wezterm workspace name this machine creates ("claude" and the
+# folder workspaces from LEADER+s). Set it on machines you attach to over SSH,
+# e.g. workspacePrefix = "work:", so their workspaces never merge with
+# same-named local ones in the switcher. Empty: names are left as they are.
+workspacePrefix: ''
+
 # Empty by design: real SSH targets are machine-local and must NOT live in this
 # public repo. Add them in ~/.config/chezmoi/chezmoi.toml, one block each:
 #
