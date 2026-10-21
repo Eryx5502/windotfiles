@@ -199,6 +199,7 @@ config.unix_domains = {
 		name = "unix",
 	},
 }
+config.default_gui_startup_args = { "connect", "unix" }
 -- This is where you actually apply your config choices
 config.launch_menu = {}
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
